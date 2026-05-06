@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Translator Pro V5</title>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<!-- MENU BUTTON -->
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+<!-- SIDE MENU -->
+<div class="side-menu" id="sideMenu">
+    <h3>Menu</h3>
+    <button onclick="showHistory()">📜 History</button>
+    <button onclick="clearHistory()">🗑 Clear History</button>
+
+    <div id="historyBox"></div>
+</div>
+
+<!-- WELCOME SCREEN -->
+<div class="welcome" id="welcomeScreen">
+    <div class="welcome-box">
+        <h1>🤖 AI Translator</h1>
+        <p>Translate instantly with AI power</p>
+        <button class="start-btn" onclick="startApp()">🚀 Get Started</button>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="main-app" id="mainApp">
+
+<div class="card">
+
+<h2>🤖 AI Translator Pro V5</h2>
+
+
+<textarea id="inputText" placeholder="Type or speak..."></textarea>
+
+<select id="fromLang">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="te">Telugu</option>
+    <option value="ta">Tamil</option>
+    <option value="kn">Kannada</option>
+    <option value="ml">Malayalam</option>
+</select>
+
+<div class="row">
+    <button class="small-btn" onclick="swapLang()">🔁 Swap</button>
+    <button class="small-btn mic" onclick="startVoice()">🎤 Voice</button>
+</div>
+
+<textarea id="outputText" placeholder="Translation..." readonly></textarea>
+
+<select id="toLang">
+    <option value="te">Telugu</option>
+    <option value="hi">Hindi</option>
+    <option value="en">English</option>
+    <option value="ta">Tamil</option>
+    <option value="kn">Kannada</option>
+    <option value="ml">Malayalam</option>
+</select>
+
+<button class="btn" onclick="translateText()">Translate</button>
+<button class="btn ai-btn" onclick="speakOutput()">🔊 Speak Output</button>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
