@@ -4,75 +4,47 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<meta name="theme-color"
-content="#4facfe">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>AI Translator Pro V5</title>
 
-<link rel="stylesheet"
-href="styles.css">
+<link rel="stylesheet" href="styles.css">
 
-<!-- OCR -->
-<script defer
-src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!-- OCR LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 </head>
 
 <body>
 
-<!-- MENU -->
-<div class="menu-btn"
-onclick="toggleMenu()">
-☰
-</div>
+<!-- MENU BUTTON -->
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
 
 <!-- SIDE MENU -->
-<div class="side-menu"
-id="sideMenu">
+<div class="side-menu" id="sideMenu">
 
     <h3>Menu</h3>
 
-    <button onclick="toggleTheme()">
-        🌙 Dark Mode
-    </button>
-
-    <button onclick="showHistory()">
-        📜 History
-    </button>
-
-    <button onclick="clearHistory()">
-        🗑 Clear History
-    </button>
+    <button onclick="toggleTheme()">🌙 Dark Mode</button>
+    <button onclick="showHistory()">📜 History</button>
+    <button onclick="clearHistory()">🗑 Clear History</button>
 
     <div id="historyBox"></div>
 
 </div>
 
 <!-- OVERLAY -->
-<div class="overlay"
-id="overlay"
-onclick="toggleMenu()"></div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-<!-- WELCOME -->
-<div class="welcome"
-id="welcomeScreen">
+<!-- WELCOME SCREEN -->
+<div class="welcome" id="welcomeScreen">
 
     <div class="welcome-box">
 
-        <h1 class="typing-title">
-            🤖 AI Translator
-        </h1>
+        <h1>🤖 AI Translator</h1>
+        <p>Translate instantly with AI power</p>
 
-        <p>
-            Translate instantly with AI power
-        </p>
-
-        <button class="start-btn"
-        onclick="startApp()">
+        <button class="start-btn" onclick="startApp()">
             🚀 Get Started
         </button>
 
@@ -81,68 +53,39 @@ id="welcomeScreen">
 </div>
 
 <!-- MAIN APP -->
-<div class="main-app"
-id="mainApp">
+<div class="main-app" id="mainApp">
 
 <div class="card">
 
-    <h2 class="typing-title">
-        🤖 AI Translator Pro V5
-    </h2>
+    <h2>🤖 AI Translator Pro V5</h2>
 
     <!-- MODE -->
     <div class="mode">
 
-        <span>
-            Smart AI Translation
-        </span>
+        <span>Smart AI Translation</span>
 
-        <!-- CAMERA -->
-        <button class="camera-btn"
-        onclick="openCamera()">
-            📷
-        </button>
+        <button class="camera-btn" onclick="openCamera()">📷</button>
 
     </div>
 
     <!-- INPUT -->
     <div class="input-wrapper">
 
-        <textarea
-        id="inputText"
-        class="chat-input"
-        rows="1"
+        <textarea id="inputText" class="chat-input"
         placeholder="Type, speak or scan text..."></textarea>
 
-        <!-- FILE -->
-        <button class="file-menu-btn"
-        onclick="toggleFileMenu()">
-            ⋮
-        </button>
+        <button class="file-menu-btn" onclick="toggleFileMenu()">⋮</button>
 
     </div>
 
-    <!-- FILE POPUP -->
-    <div class="file-popup"
-    id="filePopup">
-
-        <h4>Files</h4>
-
-        <input
-        type="file"
-        id="fileInput"
-        accept=".txt"
-        onchange="loadFile(event)">
-
-        <button onclick="toggleFileMenu()">
-            Close
-        </button>
-
+    <!-- FILE MENU -->
+    <div class="file-popup" id="filePopup">
+        <input type="file" onchange="loadFile(event)">
+        <button onclick="toggleFileMenu()">Close</button>
     </div>
 
-    <!-- FROM -->
+    <!-- FROM LANGUAGE -->
     <select id="fromLang">
-
         <option value="auto">Auto Detect</option>
         <option value="en">English</option>
         <option value="hi">Hindi</option>
@@ -150,53 +93,36 @@ id="mainApp">
         <option value="ta">Tamil</option>
         <option value="kn">Kannada</option>
         <option value="ml">Malayalam</option>
-
     </select>
 
     <!-- BUTTON ROW -->
     <div class="row">
 
-        <button class="small-btn"
-        onclick="swapLang()">
-            🔁 Swap
-        </button>
-
-        <button class="small-btn"
-        onclick="startVoice()">
-            🎤 Voice
-        </button>
+        <button class="small-btn" onclick="swapLang()">🔁 Swap</button>
+        <button class="small-btn" onclick="startVoice()">🎤 Voice</button>
 
     </div>
 
     <!-- OUTPUT -->
-    <textarea
-    id="outputText"
-    class="chat-output"
-    rows="1"
-    placeholder="Translation..."
-    readonly></textarea>
+    <textarea id="outputText" class="chat-output" readonly></textarea>
 
-    <!-- TO -->
+    <!-- TO LANGUAGE -->
     <select id="toLang">
-
         <option value="te">Telugu</option>
         <option value="hi">Hindi</option>
         <option value="en">English</option>
         <option value="ta">Tamil</option>
         <option value="kn">Kannada</option>
         <option value="ml">Malayalam</option>
-
     </select>
 
     <!-- TRANSLATE -->
-    <button class="btn"
-    onclick="translateText(false)">
+    <button class="btn" onclick="translateText(false)">
         Translate
     </button>
 
-    <!-- SPEAK -->
-    <button class="btn ai-btn"
-    onclick="speakOutput()">
+    <!-- SPEAK OUTPUT (TOGGLED IN JS) -->
+    <button class="btn ai-btn" onclick="toggleSpeak()">
         🔊 Speak Output
     </button>
 
@@ -205,53 +131,26 @@ id="mainApp">
 </div>
 
 <!-- CAMERA MODAL -->
-<div class="camera-modal"
-id="cameraModal">
+<div class="camera-modal" id="cameraModal">
 
-    <!-- CAMERA -->
-    <video
-    id="camera"
-    autoplay
-    muted
-    playsinline></video>
+    <video id="camera" autoplay playsinline muted></video>
 
-    <!-- HIDDEN CANVAS -->
-    <canvas
-    id="captureCanvas"
-    style="display:none;"></canvas>
+    <canvas id="captureCanvas" style="display:none;"></canvas>
 
-    <!-- STATUS -->
-    <div id="scanStatus">
+    <div id="scanStatus">Waiting for camera...</div>
 
-        Waiting for camera...
-
-    </div>
-
-    <!-- BUTTONS -->
     <div class="camera-controls">
 
-        <!-- CLICK ME -->
-        <button
-        id="scanBtn"
-        onclick="captureImage()">
-
+        <button id="scanBtn" onclick="captureImage()">
             📸 Click Me
-
         </button>
 
-        <!-- CLOSE -->
-        <button
-        onclick="closeCamera()">
-
-            ❌ Close
-
-        </button>
+        <button onclick="closeCamera()">❌ Close</button>
 
     </div>
 
 </div>
 
-<!-- SCRIPT -->
 <script src="script.js"></script>
 
 </body>
