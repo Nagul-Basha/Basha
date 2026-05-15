@@ -19,7 +19,9 @@ body{
     animation:bgMove 12s ease infinite;
 
     color:#111;
+
     min-height:100vh;
+
     overflow-x:hidden;
 }
 
@@ -32,6 +34,7 @@ body.dark{
 /* MENU BUTTON */
 .menu-btn{
     position:fixed;
+
     top:15px;
     right:15px;
 
@@ -52,7 +55,7 @@ body.dark{
 
     cursor:pointer;
 
-    z-index:1000;
+    z-index:99999;
 
     transition:0.3s;
 }
@@ -69,25 +72,23 @@ body.dark{
     right:-320px;
 
     width:300px;
-    height:100%;
+    height:100vh;
 
-    background:rgba(255,255,255,0.82);
+    background:rgba(255,255,255,0.85);
 
-    backdrop-filter:blur(16px);
+    backdrop-filter:blur(18px);
 
     padding:20px;
-
-    box-shadow:-5px 0 20px rgba(0,0,0,0.3);
-
-    z-index:1001;
-
-    transition:0.4s ease;
-
-    overflow-y:auto;
 
     display:flex;
     flex-direction:column;
     gap:12px;
+
+    transition:0.4s ease;
+
+    z-index:100000;
+
+    overflow-y:auto;
 }
 
 .side-menu.active{
@@ -95,15 +96,17 @@ body.dark{
 }
 
 body.dark .side-menu{
-    background:rgba(20,20,30,0.9);
+    background:rgba(20,20,30,0.95);
 }
 
 /* SIDE BUTTONS */
 .side-menu button{
     width:100%;
+
     padding:12px;
 
     border:none;
+
     border-radius:18px;
 
     background:linear-gradient(
@@ -113,6 +116,7 @@ body.dark .side-menu{
     );
 
     color:white;
+
     cursor:pointer;
 
     transition:0.3s;
@@ -135,6 +139,7 @@ body.dark .side-menu{
     background:rgba(0,0,0,0.45);
 
     opacity:0;
+
     pointer-events:none;
 
     transition:0.3s;
@@ -149,7 +154,7 @@ body.dark .side-menu{
 
 /* HISTORY */
 .history-item{
-    background:rgba(255,255,255,0.6);
+    background:rgba(255,255,255,0.65);
 
     padding:10px;
 
@@ -167,7 +172,7 @@ body.dark .history-item{
 /* WELCOME */
 .welcome{
     width:100%;
-    height:100vh;
+    min-height:100vh;
 
     display:flex;
     align-items:center;
@@ -180,7 +185,7 @@ body.dark .history-item{
     width:100%;
     max-width:420px;
 
-    background:rgba(255,255,255,0.78);
+    background:rgba(255,255,255,0.8);
 
     backdrop-filter:blur(18px);
 
@@ -198,7 +203,7 @@ body.dark .history-item{
 }
 
 body.dark .welcome-box{
-    background:rgba(20,20,30,0.85);
+    background:rgba(20,20,30,0.9);
 }
 
 /* TITLES */
@@ -219,6 +224,7 @@ h2{
     padding:14px 20px;
 
     border:none;
+
     border-radius:22px;
 
     background:linear-gradient(
@@ -228,6 +234,7 @@ h2{
     );
 
     color:white;
+
     cursor:pointer;
 
     transition:0.3s;
@@ -255,7 +262,7 @@ h2{
     width:100%;
     max-width:420px;
 
-    background:rgba(255,255,255,0.78);
+    background:rgba(255,255,255,0.8);
 
     backdrop-filter:blur(20px);
 
@@ -263,31 +270,39 @@ h2{
 
     padding:20px;
 
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
     animation:fadeIn 0.6s ease;
 
     position:relative;
 }
 
 body.dark .card{
-    background:rgba(20,20,30,0.88);
+    background:rgba(20,20,30,0.9);
 }
 
 /* MODE */
 .mode{
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
 
     font-size:13px;
+
     color:gray;
 }
 
 /* CAMERA BUTTON */
 .camera-btn{
-    width:42px;
-    height:42px;
+    width:45px;
+    height:45px;
 
     border:none;
+
     border-radius:50%;
 
     background:linear-gradient(
@@ -315,28 +330,30 @@ body.dark .card{
     width:100%;
 }
 
-/* TEXTAREAS */
+/* TEXTAREA */
 .chat-input,
 .chat-output{
     width:100%;
 
-    min-height:55px;
+    min-height:60px;
     max-height:220px;
 
     padding:14px;
     padding-right:60px;
 
     border:none;
+
     border-radius:18px;
 
     resize:none;
 
     overflow-y:auto;
+
     outline:none;
 
     font-size:15px;
 
-    background:rgba(255,255,255,0.65);
+    background:rgba(255,255,255,0.7);
 
     backdrop-filter:blur(10px);
 
@@ -362,6 +379,7 @@ body.dark .chat-output{
     height:32px;
 
     border:none;
+
     border-radius:10px;
 
     background:rgba(0,0,0,0.2);
@@ -411,11 +429,12 @@ select{
     padding:12px;
 
     border:none;
+
     border-radius:18px;
 
     outline:none;
 
-    background:rgba(255,255,255,0.65);
+    background:rgba(255,255,255,0.7);
 
     font-size:15px;
 }
@@ -432,6 +451,7 @@ body.dark select{
     padding:13px;
 
     border:none;
+
     border-radius:22px;
 
     background:linear-gradient(
@@ -466,6 +486,7 @@ body.dark select{
     padding:12px;
 
     border:none;
+
     border-radius:20px;
 
     background:linear-gradient(
@@ -495,24 +516,28 @@ body.dark select{
     width:100%;
     height:100%;
 
-    background:rgba(0,0,0,0.97);
+    background:black;
 
     display:none;
 
     flex-direction:column;
 
     align-items:center;
+
     justify-content:center;
 
-    padding:20px;
+    padding:15px;
 
-    z-index:99999;
+    z-index:999999;
 }
 
-/* CAMERA VIDEO */
+/* VIDEO */
 .camera-modal video{
     width:100%;
-    max-width:520px;
+
+    max-width:550px;
+
+    max-height:70vh;
 
     border-radius:20px;
 
@@ -522,15 +547,48 @@ body.dark select{
 
     object-fit:cover;
 
-    box-shadow:0 0 30px rgba(255,255,255,0.2);
+    box-shadow:0 0 25px rgba(255,255,255,0.25);
+}
+
+/* STATUS */
+#scanStatus{
+    margin-top:15px;
+
+    color:white;
+
+    font-size:15px;
+
+    text-align:center;
+
+    background:rgba(255,255,255,0.1);
+
+    padding:10px 15px;
+
+    border-radius:12px;
+
+    backdrop-filter:blur(10px);
+}
+
+/* CAMERA CONTROLS */
+.camera-controls{
+    display:flex;
+
+    gap:12px;
+
+    margin-top:18px;
+
+    flex-wrap:wrap;
+
+    justify-content:center;
 }
 
 /* CAMERA BUTTONS */
-.camera-modal button{
-    padding:12px 18px;
+.camera-controls button{
+    padding:13px 20px;
 
     border:none;
-    border-radius:14px;
+
+    border-radius:16px;
 
     background:linear-gradient(
         90deg,
@@ -547,24 +605,11 @@ body.dark select{
     transition:0.3s;
 }
 
-.camera-modal button:hover{
+.camera-controls button:hover{
     transform:scale(1.05);
 }
 
-/* STATUS */
-#scanStatus{
-    padding:10px 16px;
-
-    background:rgba(255,255,255,0.1);
-
-    border-radius:12px;
-
-    margin-top:15px;
-
-    backdrop-filter:blur(10px);
-}
-
-/* ANIMATIONS */
+/* ANIMATION */
 @keyframes fadeIn{
 
     from{
@@ -607,12 +652,22 @@ body.dark select{
     }
 
     .camera-modal video{
-        width:95%;
+        width:100%;
+        border-radius:16px;
     }
 
     .btn,
     .small-btn{
         font-size:14px;
+    }
+
+    .camera-controls{
+        flex-direction:column;
+        width:100%;
+    }
+
+    .camera-controls button{
+        width:100%;
     }
 
 }
