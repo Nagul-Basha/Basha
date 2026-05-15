@@ -1,4 +1,4 @@
-let stream;
+let stream = null;
 
 // =========================
 // TYPEWRITER
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         typeWriter(
             welcomeTitle,
             welcomeTitle.innerText,
-            70
+            60
         );
 
     }
@@ -59,10 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
             typeWriter(
                 mainTitle,
                 mainTitle.innerText,
-                60
+                50
             );
 
-        }, 1200);
+        }, 1000);
 
     }
 
@@ -82,16 +82,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             timer = setTimeout(() => {
 
-                translateText();
+                translateText(false);
 
-            }, 600);
+            }, 700);
 
         });
 
     }
 
     // LOAD THEME
-    if (localStorage.getItem("theme") === "dark") {
+    if (
+        localStorage.getItem("theme") === "dark"
+    ) {
 
         document.body.classList.add("dark");
 
@@ -152,10 +154,15 @@ function saveHistory(input, output) {
 
     let history =
         JSON.parse(
-            localStorage.getItem("translatorHistory")
+            localStorage.getItem(
+                "translatorHistory"
+            )
         ) || [];
 
-    history.unshift({ input, output });
+    history.unshift({
+        input,
+        output
+    });
 
     if (history.length > 20) {
 
@@ -177,7 +184,9 @@ function showHistory() {
 
     let history =
         JSON.parse(
-            localStorage.getItem("translatorHistory")
+            localStorage.getItem(
+                "translatorHistory"
+            )
         ) || [];
 
     historyBox.innerHTML = "<h4>History</h4>";
@@ -206,7 +215,9 @@ function showHistory() {
 
 function clearHistory() {
 
-    localStorage.removeItem("translatorHistory");
+    localStorage.removeItem(
+        "translatorHistory"
+    );
 
     showHistory();
 
@@ -238,7 +249,7 @@ function swapLang() {
     [from.value, to.value] =
         [to.value, from.value];
 
-    translateText();
+    translateText(false);
 
 }
 
@@ -275,62 +286,77 @@ function startVoice() {
 
     }
 
-    let recognition =
+    const recognition =
         new SpeechRecognition();
 
     recognition.lang =
         speechLangMap[
-            document.getElementById("fromLang").value
-        ];
+            document.getElementById(
+                "fromLang"
+            ).value
+        ] || "en-US";
 
     recognition.interimResults = false;
 
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (e) => {
+    recognition.start();
+
+    recognition.onresult = (event) => {
 
         const text =
-            e.results[0][0].transcript;
+            event.results[0][0].transcript;
 
-        document.getElementById("inputText")
-            .value = text;
+        document.getElementById(
+            "inputText"
+        ).value = text;
 
         autoResize(
-            document.getElementById("inputText")
+            document.getElementById(
+                "inputText"
+            )
         );
 
-        translateText();
+        translateText(true);
 
     };
 
     recognition.onerror = () => {
 
-        alert("Voice recognition error");
+        alert(
+            "Voice recognition error"
+        );
 
     };
-
-    recognition.start();
 
 }
 
 // =========================
 // TRANSLATE
 // =========================
-async function translateText(autoSpeak = true) {
+async function translateText(autoSpeak = false) {
 
-    let text =
-        document.getElementById("inputText").value;
+    const text =
+        document.getElementById(
+            "inputText"
+        ).value.trim();
 
-    let from =
-        document.getElementById("fromLang").value;
+    const from =
+        document.getElementById(
+            "fromLang"
+        ).value;
 
-    let to =
-        document.getElementById("toLang").value;
+    const to =
+        document.getElementById(
+            "toLang"
+        ).value;
 
     const output =
-        document.getElementById("outputText");
+        document.getElementById(
+            "outputText"
+        );
 
-    if (!text.trim()) {
+    if (!text) {
 
         output.value = "";
 
@@ -342,14 +368,16 @@ async function translateText(autoSpeak = true) {
 
     try {
 
-        let url =
+        const url =
             `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
 
-        let res = await fetch(url);
+        const response =
+            await fetch(url);
 
-        let data = await res.json();
+        const data =
+            await response.json();
 
-        let translated =
+        const translated =
             data[0]
             .map(item => item[0])
             .join("");
@@ -360,16 +388,15 @@ async function translateText(autoSpeak = true) {
 
         saveHistory(text, translated);
 
-        // AUTO SPEAK
         if (autoSpeak) {
 
             speakOutput();
 
         }
 
-    } catch (err) {
+    } catch (error) {
 
-        console.log(err);
+        console.log(error);
 
         output.value =
             "Translation Error";
@@ -383,8 +410,10 @@ async function translateText(autoSpeak = true) {
 // =========================
 function speakOutput() {
 
-    let text =
-        document.getElementById("outputText").value;
+    const text =
+        document.getElementById(
+            "outputText"
+        ).value;
 
     if (!text.trim()) return;
 
@@ -394,7 +423,9 @@ function speakOutput() {
         new SpeechSynthesisUtterance(text);
 
     const lang =
-        document.getElementById("toLang").value;
+        document.getElementById(
+            "toLang"
+        ).value;
 
     speech.lang =
         speechLangMap[lang] || "en-US";
@@ -415,20 +446,37 @@ function speakOutput() {
 async function openCamera() {
 
     const modal =
-        document.getElementById("cameraModal");
+        document.getElementById(
+            "cameraModal"
+        );
 
     const video =
-        document.getElementById("camera");
+        document.getElementById(
+            "camera"
+        );
 
     const status =
-        document.getElementById("scanStatus");
+        document.getElementById(
+            "scanStatus"
+        );
 
     try {
+
+        modal.style.display = "flex";
 
         status.innerHTML =
             "Opening camera...";
 
-        modal.style.display = "flex";
+        // STOP OLD STREAM
+        if (stream) {
+
+            stream.getTracks().forEach(track => {
+
+                track.stop();
+
+            });
+
+        }
 
         stream =
             await navigator.mediaDevices.getUserMedia({
@@ -451,20 +499,37 @@ async function openCamera() {
 
         video.srcObject = stream;
 
+        // IMPORTANT FOR MOBILE
+        video.setAttribute(
+            "playsinline",
+            true
+        );
+
         await video.play();
 
+        // WAIT CAMERA READY
+        await new Promise(resolve => {
+
+            video.onloadedmetadata = () => {
+
+                resolve();
+
+            };
+
+        });
+
         status.innerHTML =
-            "✅ Camera ready. Click 'Click Me' button.";
+            "✅ Camera ready. Click 'Click Me'.";
 
-    } catch (err) {
+    } catch (error) {
 
-        console.log(err);
+        console.log(error);
 
         status.innerHTML =
-            "❌ Camera permission denied";
+            "❌ Camera access denied";
 
         alert(
-            "Please allow camera permission"
+            "Allow camera permission in browser settings"
         );
 
     }
@@ -477,7 +542,9 @@ async function openCamera() {
 function closeCamera() {
 
     const modal =
-        document.getElementById("cameraModal");
+        document.getElementById(
+            "cameraModal"
+        );
 
     if (stream) {
 
@@ -486,6 +553,8 @@ function closeCamera() {
             track.stop();
 
         });
+
+        stream = null;
 
     }
 
@@ -499,24 +568,47 @@ function closeCamera() {
 async function captureImage() {
 
     const video =
-        document.getElementById("camera");
+        document.getElementById(
+            "camera"
+        );
 
     const canvas =
-        document.getElementById("captureCanvas");
+        document.getElementById(
+            "captureCanvas"
+        );
 
     const status =
-        document.getElementById("scanStatus");
+        document.getElementById(
+            "scanStatus"
+        );
 
     const scanBtn =
-        document.getElementById("scanBtn");
-
-    scanBtn.disabled = true;
-
-    status.innerHTML =
-        "📸 Capturing image...";
+        document.getElementById(
+            "scanBtn"
+        );
 
     try {
 
+        scanBtn.disabled = true;
+
+        status.innerHTML =
+            "📸 Capturing image...";
+
+        // ENSURE VIDEO READY
+        if (
+            video.readyState !== 4
+        ) {
+
+            status.innerHTML =
+                "⏳ Waiting for camera...";
+
+            scanBtn.disabled = false;
+
+            return;
+
+        }
+
+        // CANVAS SIZE
         canvas.width =
             video.videoWidth;
 
@@ -526,7 +618,7 @@ async function captureImage() {
         const ctx =
             canvas.getContext("2d");
 
-        // BETTER IMAGE QUALITY
+        // DRAW IMAGE
         ctx.drawImage(
             video,
             0,
@@ -536,17 +628,19 @@ async function captureImage() {
         );
 
         status.innerHTML =
-            "🔍 Scanning text...";
+            "🔍 Reading text...";
 
         // OCR
         const result =
             await Tesseract.recognize(
                 canvas,
-                "eng+hin+tel",
+                "eng",
                 {
                     logger: m => {
 
-                        if (m.status) {
+                        if (
+                            m.status
+                        ) {
 
                             status.innerHTML =
                                 `🔍 ${m.status}`;
@@ -571,16 +665,19 @@ async function captureImage() {
 
         }
 
-        // PUT TEXT
-        document.getElementById("inputText")
-            .value = text;
+        // INSERT TEXT
+        document.getElementById(
+            "inputText"
+        ).value = text;
 
         autoResize(
-            document.getElementById("inputText")
+            document.getElementById(
+                "inputText"
+            )
         );
 
         status.innerHTML =
-            "✅ Text detected successfully";
+            "✅ Text detected";
 
         // AUTO TRANSLATE
         await translateText(true);
@@ -588,16 +685,16 @@ async function captureImage() {
         status.innerHTML =
             "✅ Translation completed";
 
-        // AUTO CLOSE CAMERA
+        // AUTO CLOSE
         setTimeout(() => {
 
             closeCamera();
 
         }, 1500);
 
-    } catch (err) {
+    } catch (error) {
 
-        console.log(err);
+        console.log(error);
 
         status.innerHTML =
             "❌ OCR failed";
@@ -614,7 +711,9 @@ async function captureImage() {
 function toggleFileMenu() {
 
     const popup =
-        document.getElementById("filePopup");
+        document.getElementById(
+            "filePopup"
+        );
 
     popup.style.display =
         popup.style.display === "flex"
@@ -641,14 +740,17 @@ function loadFile(event) {
         const text =
             e.target.result;
 
-        document.getElementById("inputText")
-            .value = text;
+        document.getElementById(
+            "inputText"
+        ).value = text;
 
         autoResize(
-            document.getElementById("inputText")
+            document.getElementById(
+                "inputText"
+            )
         );
 
-        translateText();
+        translateText(false);
 
     };
 
