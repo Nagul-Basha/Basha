@@ -3,32 +3,21 @@ let stream = null;
 // =========================
 // TYPEWRITER
 // =========================
-function typeWriter(element, text, speed = 80, callback) {
-
+function typeWriter(element, text, speed = 70, callback) {
     let i = 0;
-
     element.innerHTML = "";
 
     function typing() {
-
         if (i < text.length) {
-
             element.innerHTML += text.charAt(i);
-
             i++;
-
             setTimeout(typing, speed);
-
         } else if (callback) {
-
             callback();
-
         }
-
     }
 
     typing();
-
 }
 
 // =========================
@@ -36,67 +25,33 @@ function typeWriter(element, text, speed = 80, callback) {
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
 
-    const welcomeTitle =
-        document.querySelector(".welcome-box h1");
-
-    const mainTitle =
-        document.querySelector(".card h2");
+    const welcomeTitle = document.querySelector(".welcome-box h1");
+    const mainTitle = document.querySelector(".card h2");
 
     if (welcomeTitle) {
-
-        typeWriter(
-            welcomeTitle,
-            welcomeTitle.innerText,
-            60
-        );
-
+        typeWriter(welcomeTitle, welcomeTitle.innerText, 60);
     }
 
     if (mainTitle) {
-
         setTimeout(() => {
-
-            typeWriter(
-                mainTitle,
-                mainTitle.innerText,
-                50
-            );
-
-        }, 1000);
-
+            typeWriter(mainTitle, mainTitle.innerText, 50);
+        }, 800);
     }
 
     // AUTO TRANSLATE
-    const input =
-        document.getElementById("inputText");
+    const input = document.getElementById("inputText");
 
     if (input) {
-
         let timer;
 
         input.addEventListener("input", () => {
-
             autoResize(input);
 
             clearTimeout(timer);
-
             timer = setTimeout(() => {
-
                 translateText(false);
-
-            }, 700);
-
+            }, 600);
         });
-
-    }
-
-    // LOAD THEME
-    if (
-        localStorage.getItem("theme") === "dark"
-    ) {
-
-        document.body.classList.add("dark");
-
     }
 
 });
@@ -105,230 +60,63 @@ document.addEventListener("DOMContentLoaded", () => {
 // START APP
 // =========================
 function startApp() {
-
-    document.getElementById("welcomeScreen")
-        .style.display = "none";
-
-    document.getElementById("mainApp")
-        .style.display = "flex";
-
+    document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("mainApp").style.display = "flex";
 }
 
 // =========================
 // MENU
 // =========================
 function toggleMenu() {
-
-    const menu =
-        document.getElementById("sideMenu");
-
-    const overlay =
-        document.getElementById("overlay");
-
-    menu.classList.toggle("active");
-
-    overlay.classList.toggle("active");
-
-}
-
-// =========================
-// DARK MODE
-// =========================
-function toggleTheme() {
-
-    document.body.classList.toggle("dark");
-
-    localStorage.setItem(
-        "theme",
-        document.body.classList.contains("dark")
-            ? "dark"
-            : "light"
-    );
-
-}
-
-// =========================
-// HISTORY
-// =========================
-function saveHistory(input, output) {
-
-    let history =
-        JSON.parse(
-            localStorage.getItem(
-                "translatorHistory"
-            )
-        ) || [];
-
-    history.unshift({
-        input,
-        output
-    });
-
-    if (history.length > 20) {
-
-        history.pop();
-
-    }
-
-    localStorage.setItem(
-        "translatorHistory",
-        JSON.stringify(history)
-    );
-
-}
-
-function showHistory() {
-
-    let historyBox =
-        document.getElementById("historyBox");
-
-    let history =
-        JSON.parse(
-            localStorage.getItem(
-                "translatorHistory"
-            )
-        ) || [];
-
-    historyBox.innerHTML = "<h4>History</h4>";
-
-    if (history.length === 0) {
-
-        historyBox.innerHTML +=
-            "<p>No history yet</p>";
-
-        return;
-
-    }
-
-    history.forEach(item => {
-
-        historyBox.innerHTML += `
-        <div class="history-item">
-            <b>Input:</b> ${item.input}<br>
-            <b>Output:</b> ${item.output}
-        </div>
-        `;
-
-    });
-
-}
-
-function clearHistory() {
-
-    localStorage.removeItem(
-        "translatorHistory"
-    );
-
-    showHistory();
-
+    document.getElementById("sideMenu").classList.toggle("active");
+    document.getElementById("overlay").classList.toggle("active");
 }
 
 // =========================
 // AUTO RESIZE
 // =========================
 function autoResize(el) {
-
     el.style.height = "auto";
-
-    el.style.height =
-        el.scrollHeight + "px";
-
+    el.style.height = el.scrollHeight + "px";
 }
 
 // =========================
 // SWAP LANGUAGE
 // =========================
 function swapLang() {
+    const from = document.getElementById("fromLang");
+    const to = document.getElementById("toLang");
 
-    let from =
-        document.getElementById("fromLang");
-
-    let to =
-        document.getElementById("toLang");
-
-    [from.value, to.value] =
-        [to.value, from.value];
+    [from.value, to.value] = [to.value, from.value];
 
     translateText(false);
-
 }
-
-// =========================
-// LANGUAGE MAP
-// =========================
-const speechLangMap = {
-
-    en: "en-US",
-    hi: "hi-IN",
-    te: "te-IN",
-    ta: "ta-IN",
-    kn: "kn-IN",
-    ml: "ml-IN"
-
-};
 
 // =========================
 // VOICE INPUT
 // =========================
 function startVoice() {
-
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-
-        alert(
-            "Voice recognition not supported"
-        );
-
+        alert("Voice not supported");
         return;
-
     }
 
-    const recognition =
-        new SpeechRecognition();
+    const recognition = new SpeechRecognition();
 
-    recognition.lang =
-        speechLangMap[
-            document.getElementById(
-                "fromLang"
-            ).value
-        ] || "en-US";
-
-    recognition.interimResults = false;
-
-    recognition.maxAlternatives = 1;
-
-    recognition.start();
+    recognition.lang = document.getElementById("fromLang").value;
 
     recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
 
-        const text =
-            event.results[0][0].transcript;
-
-        document.getElementById(
-            "inputText"
-        ).value = text;
-
-        autoResize(
-            document.getElementById(
-                "inputText"
-            )
-        );
+        document.getElementById("inputText").value = text;
+        autoResize(document.getElementById("inputText"));
 
         translateText(true);
-
     };
 
-    recognition.onerror = () => {
-
-        alert(
-            "Voice recognition error"
-        );
-
-    };
-
+    recognition.start();
 }
 
 // =========================
@@ -336,51 +124,26 @@ function startVoice() {
 // =========================
 async function translateText(autoSpeak = false) {
 
-    const text =
-        document.getElementById(
-            "inputText"
-        ).value.trim();
-
-    const from =
-        document.getElementById(
-            "fromLang"
-        ).value;
-
-    const to =
-        document.getElementById(
-            "toLang"
-        ).value;
-
-    const output =
-        document.getElementById(
-            "outputText"
-        );
+    const text = document.getElementById("inputText").value.trim();
+    const from = document.getElementById("fromLang").value;
+    const to = document.getElementById("toLang").value;
+    const output = document.getElementById("outputText");
 
     if (!text) {
-
         output.value = "";
-
         return;
-
     }
 
     output.value = "Translating...";
 
     try {
-
         const url =
             `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
 
-        const response =
-            await fetch(url);
+        const res = await fetch(url);
+        const data = await res.json();
 
-        const data =
-            await response.json();
-
-        const translated =
-            data[0]
-            .map(item => item[0])
-            .join("");
+        const translated = data[0].map(item => item[0]).join("");
 
         output.value = translated;
 
@@ -389,151 +152,89 @@ async function translateText(autoSpeak = false) {
         saveHistory(text, translated);
 
         if (autoSpeak) {
-
             speakOutput();
-
         }
 
-    } catch (error) {
-
-        console.log(error);
-
-        output.value =
-            "Translation Error";
-
+    } catch (err) {
+        output.value = "Translation Error";
     }
-
 }
 
 // =========================
-// SPEAK OUTPUT
+// SPEAK OUTPUT (ONLY BUTTON)
 // =========================
 function speakOutput() {
+    const text = document.getElementById("outputText").value;
 
-    const text =
-        document.getElementById(
-            "outputText"
-        ).value;
-
-    if (!text.trim()) return;
+    if (!text || text === "Translating...") return;
 
     speechSynthesis.cancel();
 
-    const speech =
-        new SpeechSynthesisUtterance(text);
+    const speech = new SpeechSynthesisUtterance(text);
 
-    const lang =
-        document.getElementById(
-            "toLang"
-        ).value;
-
-    speech.lang =
-        speechLangMap[lang] || "en-US";
+    speech.lang = document.getElementById("toLang").value;
 
     speech.rate = 1;
-
     speech.pitch = 1;
 
-    speech.volume = 1;
-
     speechSynthesis.speak(speech);
-
 }
 
 // =========================
-// OPEN CAMERA
+// HISTORY
+// =========================
+function saveHistory(input, output) {
+    let history = JSON.parse(localStorage.getItem("translatorHistory")) || [];
+
+    history.unshift({ input, output });
+
+    if (history.length > 20) history.pop();
+
+    localStorage.setItem("translatorHistory", JSON.stringify(history));
+}
+
+// =========================
+// CAMERA OPEN (FIXED FOR GITHUB PAGES)
 // =========================
 async function openCamera() {
 
-    const modal =
-        document.getElementById(
-            "cameraModal"
-        );
-
-    const video =
-        document.getElementById(
-            "camera"
-        );
-
-    const status =
-        document.getElementById(
-            "scanStatus"
-        );
+    const modal = document.getElementById("cameraModal");
+    const video = document.getElementById("camera");
+    const status = document.getElementById("scanStatus");
 
     try {
 
         modal.style.display = "flex";
+        status.innerText = "Opening camera...";
 
-        status.innerHTML =
-            "Opening camera...";
-
-        // STOP OLD STREAM
         if (stream) {
-
-            stream.getTracks().forEach(track => {
-
-                track.stop();
-
-            });
-
+            stream.getTracks().forEach(t => t.stop());
         }
 
-        stream =
-            await navigator.mediaDevices.getUserMedia({
-
-                video: {
-                    facingMode: {
-                        ideal: "environment"
-                    },
-                    width: {
-                        ideal: 1920
-                    },
-                    height: {
-                        ideal: 1080
-                    }
-                },
-
-                audio: false
-
-            });
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { ideal: "environment" }
+            },
+            audio: false
+        });
 
         video.srcObject = stream;
 
-        // IMPORTANT FOR MOBILE
-        video.setAttribute(
-            "playsinline",
-            true
-        );
+        video.setAttribute("playsinline", true);
+        video.setAttribute("autoplay", true);
 
         await video.play();
 
-        // WAIT CAMERA READY
         await new Promise(resolve => {
-
-            video.onloadedmetadata = () => {
-
-                resolve();
-
-            };
-
+            video.onloadedmetadata = () => resolve();
         });
 
-        status.innerHTML =
-            "✅ Camera ready. Click 'Click Me'.";
+        status.innerText = "Camera ready. Click 'Click Me' to scan.";
 
-    } catch (error) {
-
-        console.log(error);
-
-        status.innerHTML =
-            "❌ Camera access denied";
-
-        alert(
-            "Allow camera permission in browser settings"
-        );
-
+    } catch (err) {
+        console.log(err);
+        status.innerText = "Camera permission denied";
     }
-
 }
 
 // =========================
@@ -541,219 +242,131 @@ async function openCamera() {
 // =========================
 function closeCamera() {
 
-    const modal =
-        document.getElementById(
-            "cameraModal"
-        );
+    const modal = document.getElementById("cameraModal");
 
     if (stream) {
-
-        stream.getTracks().forEach(track => {
-
-            track.stop();
-
-        });
-
+        stream.getTracks().forEach(t => t.stop());
         stream = null;
-
     }
 
     modal.style.display = "none";
-
 }
 
 // =========================
-// CAPTURE IMAGE
+// CAPTURE + OCR (FIXED CLICK ME BUTTON)
 // =========================
 async function captureImage() {
 
-    const video =
-        document.getElementById(
-            "camera"
-        );
-
-    const canvas =
-        document.getElementById(
-            "captureCanvas"
-        );
-
-    const status =
-        document.getElementById(
-            "scanStatus"
-        );
-
-    const scanBtn =
-        document.getElementById(
-            "scanBtn"
-        );
+    const video = document.getElementById("camera");
+    const canvas = document.getElementById("captureCanvas");
+    const status = document.getElementById("scanStatus");
+    const scanBtn = document.getElementById("scanBtn");
 
     try {
 
         scanBtn.disabled = true;
+        status.innerText = "Capturing image...";
 
-        status.innerHTML =
-            "📸 Capturing image...";
-
-        // ENSURE VIDEO READY
-        if (
-            video.readyState !== 4
-        ) {
-
-            status.innerHTML =
-                "⏳ Waiting for camera...";
-
-            scanBtn.disabled = false;
-
-            return;
-
+        // WAIT FOR VIDEO READY (IMPORTANT FIX)
+        if (video.readyState < 2) {
+            await new Promise(resolve => {
+                video.onloadeddata = () => resolve();
+            });
         }
 
-        // CANVAS SIZE
-        canvas.width =
-            video.videoWidth;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-        canvas.height =
-            video.videoHeight;
+        const ctx = canvas.getContext("2d");
 
-        const ctx =
-            canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // DRAW IMAGE
-        ctx.drawImage(
-            video,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+        status.innerText = "Reading text...";
 
-        status.innerHTML =
-            "🔍 Reading text...";
+        const result = await Tesseract.recognize(canvas, "eng");
 
-        // OCR
-        const result =
-            await Tesseract.recognize(
-                canvas,
-                "eng",
-                {
-                    logger: m => {
-
-                        if (
-                            m.status
-                        ) {
-
-                            status.innerHTML =
-                                `🔍 ${m.status}`;
-
-                        }
-
-                    }
-                }
-            );
-
-        const text =
-            result.data.text.trim();
+        const text = result.data.text.trim();
 
         if (!text) {
-
-            status.innerHTML =
-                "❌ No text detected";
-
+            status.innerText = "No text found";
             scanBtn.disabled = false;
-
             return;
-
         }
 
-        // INSERT TEXT
-        document.getElementById(
-            "inputText"
-        ).value = text;
+        document.getElementById("inputText").value = text;
+        autoResize(document.getElementById("inputText"));
 
-        autoResize(
-            document.getElementById(
-                "inputText"
-            )
-        );
+        status.innerText = "Text detected";
 
-        status.innerHTML =
-            "✅ Text detected";
-
-        // AUTO TRANSLATE
         await translateText(true);
 
-        status.innerHTML =
-            "✅ Translation completed";
+        status.innerText = "Done";
 
-        // AUTO CLOSE
-        setTimeout(() => {
+        setTimeout(() => closeCamera(), 1200);
 
-            closeCamera();
-
-        }, 1500);
-
-    } catch (error) {
-
-        console.log(error);
-
-        status.innerHTML =
-            "❌ OCR failed";
-
+    } catch (err) {
+        console.log(err);
+        status.innerText = "OCR failed";
     }
 
     scanBtn.disabled = false;
+}
 
+// =========================
+// FILE LOAD
+// =========================
+function loadFile(event) {
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+
+        document.getElementById("inputText").value = e.target.result;
+
+        autoResize(document.getElementById("inputText"));
+
+        translateText(false);
+    };
+
+    reader.readAsText(file);
 }
 
 // =========================
 // FILE MENU
 // =========================
 function toggleFileMenu() {
-
-    const popup =
-        document.getElementById(
-            "filePopup"
-        );
-
-    popup.style.display =
-        popup.style.display === "flex"
-            ? "none"
-            : "flex";
-
+    const popup = document.getElementById("filePopup");
+    popup.style.display = popup.style.display === "flex" ? "none" : "flex";
 }
 
 // =========================
-// LOAD FILE
+// MENU HISTORY
 // =========================
-function loadFile(event) {
+function showHistory() {
 
-    const file =
-        event.target.files[0];
+    const box = document.getElementById("historyBox");
+    const history = JSON.parse(localStorage.getItem("translatorHistory")) || [];
 
-    if (!file) return;
+    box.innerHTML = "<h4>History</h4>";
 
-    const reader =
-        new FileReader();
+    if (!history.length) {
+        box.innerHTML += "<p>No history</p>";
+        return;
+    }
 
-    reader.onload = function(e) {
+    history.forEach(h => {
+        box.innerHTML += `
+        <div class="history-item">
+            <b>In:</b> ${h.input}<br>
+            <b>Out:</b> ${h.output}
+        </div>`;
+    });
+}
 
-        const text =
-            e.target.result;
-
-        document.getElementById(
-            "inputText"
-        ).value = text;
-
-        autoResize(
-            document.getElementById(
-                "inputText"
-            )
-        );
-
-        translateText(false);
-
-    };
-
-    reader.readAsText(file);
-
+function clearHistory() {
+    localStorage.removeItem("translatorHistory");
+    showHistory();
 }
