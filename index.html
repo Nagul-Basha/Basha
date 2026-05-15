@@ -1,29 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
+<meta name="theme-color"
+content="#4facfe">
+
 <title>AI Translator Pro V5</title>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet"
+href="styles.css">
 
-<!-- OCR LIBRARY -->
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!-- TESSERACT OCR -->
+<script defer
+src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 </head>
 
 <body>
 
 <!-- MENU BUTTON -->
-<div class="menu-btn" onclick="toggleMenu()">
+<div class="menu-btn"
+onclick="toggleMenu()">
 ☰
 </div>
 
 <!-- SIDE MENU -->
-<div class="side-menu" id="sideMenu">
+<div class="side-menu"
+id="sideMenu">
 
     <h3>Menu</h3>
 
@@ -48,14 +57,13 @@ content="width=device-width, initial-scale=1.0">
 id="overlay"
 onclick="toggleMenu()"></div>
 
-<!-- WELCOME SCREEN -->
+<!-- WELCOME -->
 <div class="welcome"
 id="welcomeScreen">
 
     <div class="welcome-box">
 
-        <h1 class="typing-title"
-        id="title1">
+        <h1 class="typing-title">
             🤖 AI Translator
         </h1>
 
@@ -76,15 +84,9 @@ id="welcomeScreen">
 <div class="main-app"
 id="mainApp">
 
-<div class="card"
-style="
-display:flex;
-flex-direction:column;
-gap:12px;
-">
+<div class="card">
 
-    <h2 class="typing-title"
-    id="title2">
+    <h2 class="typing-title">
         🤖 AI Translator Pro V5
     </h2>
 
@@ -92,10 +94,10 @@ gap:12px;
     <div class="mode">
 
         <span>
-            Mode: Smart Google AI Engine
+            Smart AI Translation
         </span>
 
-        <!-- CAMERA BUTTON -->
+        <!-- CAMERA -->
         <button class="camera-btn"
         onclick="openCamera()">
             📷
@@ -110,7 +112,7 @@ gap:12px;
         id="inputText"
         class="chat-input"
         rows="1"
-        placeholder="Type or speak..."></textarea>
+        placeholder="Type, speak or scan text..."></textarea>
 
         <!-- FILE MENU -->
         <button class="file-menu-btn"
@@ -132,15 +134,13 @@ gap:12px;
         accept=".txt"
         onchange="loadFile(event)">
 
-        <div id="fileList"></div>
-
         <button onclick="toggleFileMenu()">
             Close
         </button>
 
     </div>
 
-    <!-- FROM LANGUAGE -->
+    <!-- FROM -->
     <select id="fromLang">
 
         <option value="en">English</option>
@@ -160,7 +160,7 @@ gap:12px;
             🔁 Swap
         </button>
 
-        <button class="small-btn mic"
+        <button class="small-btn"
         onclick="startVoice()">
             🎤 Voice
         </button>
@@ -175,7 +175,7 @@ gap:12px;
     placeholder="Translation..."
     readonly></textarea>
 
-    <!-- TO LANGUAGE -->
+    <!-- TO -->
     <select id="toLang">
 
         <option value="te">Telugu</option>
@@ -207,49 +207,48 @@ gap:12px;
 <div class="camera-modal"
 id="cameraModal">
 
-    <!-- LIVE CAMERA -->
+    <!-- VIDEO -->
     <video
     id="camera"
     autoplay
-    playsinline
-    muted></video>
+    muted
+    playsinline></video>
 
-    <!-- HIDDEN CANVAS -->
+    <!-- CANVAS -->
     <canvas
     id="captureCanvas"
     style="display:none;"></canvas>
 
     <!-- STATUS -->
-    <div id="scanStatus"
-    style="
-    color:white;
-    margin-top:12px;
-    font-size:15px;
-    text-align:center;
-    ">
+    <div id="scanStatus">
+
         Waiting for camera...
+
     </div>
 
-    <!-- CAMERA BUTTONS -->
-    <div style="
-    display:flex;
-    gap:10px;
-    margin-top:15px;
-    ">
+    <!-- BUTTONS -->
+    <div class="camera-controls">
 
-        <!-- UPDATED BUTTON -->
-        <button id="scanBtn" onclick="captureImage()">
+        <button
+        id="scanBtn"
+        onclick="captureImage()">
+
             📸 Click Me
+
         </button>
 
-        <button onclick="closeCamera()">
+        <button
+        onclick="closeCamera()">
+
             ❌ Close
+
         </button>
 
     </div>
 
 </div>
 
+<!-- SCRIPT -->
 <script src="script.js"></script>
 
 </body>
