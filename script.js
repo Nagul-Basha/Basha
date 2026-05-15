@@ -1,9 +1,15 @@
 let stream = null;
 
 // =========================
+// GLOBAL SPEECH CONTROL (IMPORTANT FIX)
+// =========================
+let speechInstance = null;
+let isSpeaking = false;
+
+// =========================
 // TYPEWRITER
 // =========================
-function typeWriter(element, text, speed = 70, callback) {
+function typeWriter(element, text, speed = 70) {
     let i = 0;
     element.innerHTML = "";
 
@@ -12,8 +18,6 @@ function typeWriter(element, text, speed = 70, callback) {
             element.innerHTML += text.charAt(i);
             i++;
             setTimeout(typing, speed);
-        } else if (callback) {
-            callback();
         }
     }
 
@@ -38,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 800);
     }
 
-    // AUTO TRANSLATE
     const input = document.getElementById("inputText");
 
     if (input) {
@@ -46,14 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         input.addEventListener("input", () => {
             autoResize(input);
-
             clearTimeout(timer);
+
             timer = setTimeout(() => {
                 translateText(false);
             }, 600);
         });
     }
-
 });
 
 // =========================
@@ -96,6 +98,7 @@ function swapLang() {
 // VOICE INPUT
 // =========================
 function startVoice() {
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
@@ -137,6 +140,7 @@ async function translateText(autoSpeak = false) {
     output.value = "Translating...";
 
     try {
+
         const url =
             `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
 
@@ -152,7 +156,7 @@ async function translateText(autoSpeak = false) {
         saveHistory(text, translated);
 
         if (autoSpeak) {
-            speakOutput();
+            toggleSpeak(true); // optional auto speak after scan/voice
         }
 
     } catch (err) {
@@ -161,23 +165,38 @@ async function translateText(autoSpeak = false) {
 }
 
 // =========================
-// SPEAK OUTPUT (ONLY BUTTON)
+// 🔊 TOGGLE SPEAK (FIXED)
 // =========================
-function speakOutput() {
+function toggleSpeak(forceSpeak = false) {
+
     const text = document.getElementById("outputText").value;
 
     if (!text || text === "Translating...") return;
 
-    speechSynthesis.cancel();
+    // IF already speaking → STOP
+    if (isSpeaking) {
+        speechSynthesis.cancel();
+        isSpeaking = false;
+        speechInstance = null;
+        return;
+    }
 
-    const speech = new SpeechSynthesisUtterance(text);
+    // START SPEAKING
+    speechInstance = new SpeechSynthesisUtterance(text);
 
-    speech.lang = document.getElementById("toLang").value;
+    speechInstance.lang = document.getElementById("toLang").value;
+    speechInstance.rate = 1;
+    speechInstance.pitch = 1;
 
-    speech.rate = 1;
-    speech.pitch = 1;
+    speechInstance.onend = () => {
+        isSpeaking = false;
+        speechInstance = null;
+    };
 
-    speechSynthesis.speak(speech);
+    isSpeaking = true;
+
+    speechSynthesis.cancel(); // IMPORTANT FIX (prevents overlap)
+    speechSynthesis.speak(speechInstance);
 }
 
 // =========================
@@ -194,7 +213,7 @@ function saveHistory(input, output) {
 }
 
 // =========================
-// CAMERA OPEN (FIXED FOR GITHUB PAGES)
+// CAMERA OPEN
 // =========================
 async function openCamera() {
 
@@ -219,9 +238,7 @@ async function openCamera() {
         });
 
         video.srcObject = stream;
-
         video.setAttribute("playsinline", true);
-        video.setAttribute("autoplay", true);
 
         await video.play();
 
@@ -229,11 +246,11 @@ async function openCamera() {
             video.onloadedmetadata = () => resolve();
         });
 
-        status.innerText = "Camera ready. Click 'Click Me' to scan.";
+        status.innerText = "Camera ready";
 
     } catch (err) {
         console.log(err);
-        status.innerText = "Camera permission denied";
+        status.innerText = "Camera error";
     }
 }
 
@@ -253,7 +270,7 @@ function closeCamera() {
 }
 
 // =========================
-// CAPTURE + OCR (FIXED CLICK ME BUTTON)
+// CAPTURE IMAGE (OCR FIXED)
 // =========================
 async function captureImage() {
 
@@ -265,21 +282,17 @@ async function captureImage() {
     try {
 
         scanBtn.disabled = true;
-        status.innerText = "Capturing image...";
+        status.innerText = "Capturing...";
 
-        // WAIT FOR VIDEO READY (IMPORTANT FIX)
         if (video.readyState < 2) {
-            await new Promise(resolve => {
-                video.onloadeddata = () => resolve();
-            });
+            await new Promise(r => video.onloadeddata = r);
         }
 
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
         const ctx = canvas.getContext("2d");
-
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(video, 0, 0);
 
         status.innerText = "Reading text...";
 
@@ -296,13 +309,11 @@ async function captureImage() {
         document.getElementById("inputText").value = text;
         autoResize(document.getElementById("inputText"));
 
-        status.innerText = "Text detected";
-
         await translateText(true);
 
         status.innerText = "Done";
 
-        setTimeout(() => closeCamera(), 1200);
+        setTimeout(closeCamera, 1200);
 
     } catch (err) {
         console.log(err);
@@ -323,11 +334,8 @@ function loadFile(event) {
     const reader = new FileReader();
 
     reader.onload = (e) => {
-
         document.getElementById("inputText").value = e.target.result;
-
         autoResize(document.getElementById("inputText"));
-
         translateText(false);
     };
 
@@ -343,7 +351,7 @@ function toggleFileMenu() {
 }
 
 // =========================
-// MENU HISTORY
+// HISTORY UI
 // =========================
 function showHistory() {
 
@@ -352,16 +360,11 @@ function showHistory() {
 
     box.innerHTML = "<h4>History</h4>";
 
-    if (!history.length) {
-        box.innerHTML += "<p>No history</p>";
-        return;
-    }
-
     history.forEach(h => {
         box.innerHTML += `
         <div class="history-item">
-            <b>In:</b> ${h.input}<br>
-            <b>Out:</b> ${h.output}
+            <b>Input:</b> ${h.input}<br>
+            <b>Output:</b> ${h.output}
         </div>`;
     });
 }
