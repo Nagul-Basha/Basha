@@ -16,7 +16,7 @@ content="#4facfe">
 <link rel="stylesheet"
 href="styles.css">
 
-<!-- TESSERACT OCR -->
+<!-- OCR -->
 <script defer
 src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -24,7 +24,7 @@ src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script
 
 <body>
 
-<!-- MENU BUTTON -->
+<!-- MENU -->
 <div class="menu-btn"
 onclick="toggleMenu()">
 ☰
@@ -114,7 +114,7 @@ id="mainApp">
         rows="1"
         placeholder="Type, speak or scan text..."></textarea>
 
-        <!-- FILE MENU -->
+        <!-- FILE -->
         <button class="file-menu-btn"
         onclick="toggleFileMenu()">
             ⋮
@@ -143,6 +143,7 @@ id="mainApp">
     <!-- FROM -->
     <select id="fromLang">
 
+        <option value="auto">Auto Detect</option>
         <option value="en">English</option>
         <option value="hi">Hindi</option>
         <option value="te">Telugu</option>
@@ -189,7 +190,7 @@ id="mainApp">
 
     <!-- TRANSLATE -->
     <button class="btn"
-    onclick="translateText()">
+    onclick="translateText(false)">
         Translate
     </button>
 
@@ -207,14 +208,14 @@ id="mainApp">
 <div class="camera-modal"
 id="cameraModal">
 
-    <!-- VIDEO -->
+    <!-- CAMERA -->
     <video
     id="camera"
     autoplay
     muted
     playsinline></video>
 
-    <!-- CANVAS -->
+    <!-- HIDDEN CANVAS -->
     <canvas
     id="captureCanvas"
     style="display:none;"></canvas>
@@ -229,6 +230,7 @@ id="cameraModal">
     <!-- BUTTONS -->
     <div class="camera-controls">
 
+        <!-- CLICK ME -->
         <button
         id="scanBtn"
         onclick="captureImage()">
@@ -237,6 +239,7 @@ id="cameraModal">
 
         </button>
 
+        <!-- CLOSE -->
         <button
         onclick="closeCamera()">
 
