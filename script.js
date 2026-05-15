@@ -1,618 +1,657 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+let stream;
+
+// =========================
+// TYPEWRITER
+// =========================
+function typeWriter(element, text, speed = 80, callback) {
+
+    let i = 0;
+
+    element.innerHTML = "";
+
+    function typing() {
+
+        if (i < text.length) {
+
+            element.innerHTML += text.charAt(i);
+
+            i++;
+
+            setTimeout(typing, speed);
+
+        } else if (callback) {
+
+            callback();
+
+        }
+
+    }
+
+    typing();
+
 }
 
-/* BODY */
-body{
-    background:linear-gradient(
-        270deg,
-        #4facfe,
-        #00f2fe,
-        #6a11cb,
-        #ff0066
+// =========================
+// PAGE LOAD
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+
+    const welcomeTitle =
+        document.querySelector(".welcome-box h1");
+
+    const mainTitle =
+        document.querySelector(".card h2");
+
+    if (welcomeTitle) {
+
+        typeWriter(
+            welcomeTitle,
+            welcomeTitle.innerText,
+            70
+        );
+
+    }
+
+    if (mainTitle) {
+
+        setTimeout(() => {
+
+            typeWriter(
+                mainTitle,
+                mainTitle.innerText,
+                60
+            );
+
+        }, 1200);
+
+    }
+
+    // AUTO TRANSLATE
+    const input =
+        document.getElementById("inputText");
+
+    if (input) {
+
+        let timer;
+
+        input.addEventListener("input", () => {
+
+            autoResize(input);
+
+            clearTimeout(timer);
+
+            timer = setTimeout(() => {
+
+                translateText();
+
+            }, 600);
+
+        });
+
+    }
+
+    // LOAD THEME
+    if (localStorage.getItem("theme") === "dark") {
+
+        document.body.classList.add("dark");
+
+    }
+
+});
+
+// =========================
+// START APP
+// =========================
+function startApp() {
+
+    document.getElementById("welcomeScreen")
+        .style.display = "none";
+
+    document.getElementById("mainApp")
+        .style.display = "flex";
+
+}
+
+// =========================
+// MENU
+// =========================
+function toggleMenu() {
+
+    const menu =
+        document.getElementById("sideMenu");
+
+    const overlay =
+        document.getElementById("overlay");
+
+    menu.classList.toggle("active");
+
+    overlay.classList.toggle("active");
+
+}
+
+// =========================
+// DARK MODE
+// =========================
+function toggleTheme() {
+
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark")
+            ? "dark"
+            : "light"
     );
 
-    background-size:400% 400%;
-    animation:bgMove 12s ease infinite;
-
-    color:#111;
-    min-height:100vh;
-    overflow-x:hidden;
 }
 
-/* DARK MODE */
-body.dark{
-    background:#0f172a;
-    color:white;
-}
+// =========================
+// HISTORY
+// =========================
+function saveHistory(input, output) {
 
-/* MENU BUTTON */
-.menu-btn{
-    position:fixed;
-    top:15px;
-    right:15px;
+    let history =
+        JSON.parse(
+            localStorage.getItem("translatorHistory")
+        ) || [];
 
-    width:50px;
-    height:50px;
+    history.unshift({ input, output });
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    if (history.length > 20) {
 
-    font-size:25px;
+        history.pop();
 
-    background:rgba(255,255,255,0.75);
+    }
 
-    backdrop-filter:blur(12px);
-
-    border-radius:18px;
-
-    cursor:pointer;
-
-    z-index:1000;
-
-    transition:0.3s;
-}
-
-.menu-btn:hover{
-    transform:scale(1.08);
-}
-
-/* SIDE MENU */
-.side-menu{
-    position:fixed;
-
-    top:0;
-    right:-320px;
-
-    width:300px;
-    height:100%;
-
-    background:rgba(255,255,255,0.82);
-
-    backdrop-filter:blur(16px);
-
-    padding:20px;
-
-    box-shadow:-5px 0 20px rgba(0,0,0,0.3);
-
-    z-index:1001;
-
-    transition:0.4s ease;
-
-    overflow-y:auto;
-
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-}
-
-.side-menu.active{
-    right:0;
-}
-
-body.dark .side-menu{
-    background:rgba(20,20,30,0.9);
-}
-
-/* SIDE BUTTONS */
-.side-menu button{
-    width:100%;
-    padding:12px;
-
-    border:none;
-    border-radius:18px;
-
-    background:linear-gradient(
-        90deg,
-        #4facfe,
-        #00f2fe
+    localStorage.setItem(
+        "translatorHistory",
+        JSON.stringify(history)
     );
 
-    color:white;
-    cursor:pointer;
-
-    transition:0.3s;
 }
 
-.side-menu button:hover{
-    transform:translateY(-2px);
-}
+function showHistory() {
 
-/* OVERLAY */
-.overlay{
-    position:fixed;
+    let historyBox =
+        document.getElementById("historyBox");
 
-    top:0;
-    left:0;
+    let history =
+        JSON.parse(
+            localStorage.getItem("translatorHistory")
+        ) || [];
 
-    width:100%;
-    height:100%;
+    historyBox.innerHTML = "<h4>History</h4>";
 
-    background:rgba(0,0,0,0.45);
+    if (history.length === 0) {
 
-    opacity:0;
-    pointer-events:none;
+        historyBox.innerHTML +=
+            "<p>No history yet</p>";
 
-    transition:0.3s;
+        return;
 
-    z-index:900;
-}
-
-.overlay.active{
-    opacity:1;
-    pointer-events:auto;
-}
-
-/* HISTORY */
-.history-item{
-    background:rgba(255,255,255,0.6);
-
-    padding:10px;
-
-    border-radius:12px;
-
-    font-size:13px;
-
-    line-height:1.5;
-}
-
-body.dark .history-item{
-    background:rgba(255,255,255,0.1);
-}
-
-/* WELCOME */
-.welcome{
-    width:100%;
-    height:100vh;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:20px;
-}
-
-.welcome-box{
-    width:100%;
-    max-width:420px;
-
-    background:rgba(255,255,255,0.78);
-
-    backdrop-filter:blur(18px);
-
-    border-radius:24px;
-
-    padding:35px 25px;
-
-    text-align:center;
-
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-
-    animation:fadeIn 0.7s ease;
-}
-
-body.dark .welcome-box{
-    background:rgba(20,20,30,0.85);
-}
-
-/* TITLES */
-h1,
-h2{
-    background:linear-gradient(
-        90deg,
-        #00f2fe,
-        #4facfe
-    );
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-/* START BUTTON */
-.start-btn{
-    padding:14px 20px;
-
-    border:none;
-    border-radius:22px;
-
-    background:linear-gradient(
-        90deg,
-        #4facfe,
-        #00f2fe
-    );
-
-    color:white;
-    cursor:pointer;
-
-    transition:0.3s;
-}
-
-.start-btn:hover{
-    transform:scale(1.05);
-}
-
-/* MAIN APP */
-.main-app{
-    display:none;
-
-    width:100%;
-    min-height:100vh;
-
-    align-items:center;
-    justify-content:center;
-
-    padding:20px;
-}
-
-/* CARD */
-.card{
-    width:100%;
-    max-width:420px;
-
-    background:rgba(255,255,255,0.78);
-
-    backdrop-filter:blur(20px);
-
-    border-radius:24px;
-
-    padding:20px;
-
-    animation:fadeIn 0.6s ease;
-
-    position:relative;
-}
-
-body.dark .card{
-    background:rgba(20,20,30,0.88);
-}
-
-/* MODE */
-.mode{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    font-size:13px;
-    color:gray;
-}
-
-/* CAMERA BUTTON */
-.camera-btn{
-    width:42px;
-    height:42px;
-
-    border:none;
-    border-radius:50%;
-
-    background:linear-gradient(
-        90deg,
-        #ff7eb3,
-        #ff758c
-    );
-
-    color:white;
-
-    font-size:18px;
-
-    cursor:pointer;
-
-    transition:0.3s;
-}
-
-.camera-btn:hover{
-    transform:scale(1.08);
-}
-
-/* INPUT WRAPPER */
-.input-wrapper{
-    position:relative;
-    width:100%;
-}
-
-/* TEXTAREAS */
-.chat-input,
-.chat-output{
-    width:100%;
-
-    min-height:55px;
-    max-height:220px;
-
-    padding:14px;
-    padding-right:60px;
-
-    border:none;
-    border-radius:18px;
-
-    resize:none;
-
-    overflow-y:auto;
-    outline:none;
-
-    font-size:15px;
-
-    background:rgba(255,255,255,0.65);
-
-    backdrop-filter:blur(10px);
-
-    line-height:1.5;
-}
-
-body.dark .chat-input,
-body.dark .chat-output{
-    background:rgba(255,255,255,0.1);
-    color:white;
-}
-
-/* FILE BUTTON */
-.file-menu-btn{
-    position:absolute;
-
-    top:50%;
-    right:10px;
-
-    transform:translateY(-50%);
-
-    width:32px;
-    height:32px;
-
-    border:none;
-    border-radius:10px;
-
-    background:rgba(0,0,0,0.2);
-
-    color:white;
-
-    cursor:pointer;
-}
-
-/* FILE POPUP */
-.file-popup{
-    position:absolute;
-
-    top:65px;
-    right:10px;
-
-    width:220px;
-
-    background:rgba(255,255,255,0.95);
-
-    backdrop-filter:blur(14px);
-
-    border-radius:16px;
-
-    padding:12px;
-
-    display:none;
-
-    flex-direction:column;
-
-    gap:10px;
-
-    z-index:9999;
-
-    box-shadow:0 0 20px rgba(0,0,0,0.2);
-}
-
-body.dark .file-popup{
-    background:rgba(30,30,40,0.96);
-    color:white;
-}
-
-/* SELECT */
-select{
-    width:100%;
-
-    padding:12px;
-
-    border:none;
-    border-radius:18px;
-
-    outline:none;
-
-    background:rgba(255,255,255,0.65);
-
-    font-size:15px;
-}
-
-body.dark select{
-    background:rgba(255,255,255,0.1);
-    color:white;
-}
-
-/* BUTTON */
-.btn{
-    width:100%;
-
-    padding:13px;
-
-    border:none;
-    border-radius:22px;
-
-    background:linear-gradient(
-        90deg,
-        #6a11cb,
-        #2575fc
-    );
-
-    color:white;
-
-    cursor:pointer;
-
-    transition:0.3s;
-
-    font-size:15px;
-}
-
-.btn:hover{
-    transform:scale(1.02);
-}
-
-/* ROW */
-.row{
-    display:flex;
-    gap:10px;
-}
-
-/* SMALL BUTTONS */
-.small-btn{
-    flex:1;
-
-    padding:12px;
-
-    border:none;
-    border-radius:20px;
-
-    background:linear-gradient(
-        90deg,
-        #4facfe,
-        #00f2fe
-    );
-
-    color:white;
-
-    cursor:pointer;
-
-    transition:0.3s;
-}
-
-.small-btn:hover{
-    transform:scale(1.03);
-}
-
-/* CAMERA MODAL */
-.camera-modal{
-    position:fixed;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:100%;
-
-    background:rgba(0,0,0,0.97);
-
-    display:none;
-
-    flex-direction:column;
-
-    align-items:center;
-    justify-content:center;
-
-    padding:20px;
-
-    z-index:99999;
-}
-
-/* CAMERA VIDEO */
-.camera-modal video{
-    width:100%;
-    max-width:520px;
-
-    border-radius:20px;
-
-    background:black;
-
-    border:3px solid white;
-
-    object-fit:cover;
-
-    box-shadow:0 0 30px rgba(255,255,255,0.2);
-}
-
-/* CAMERA BUTTONS */
-.camera-modal button{
-    padding:12px 18px;
-
-    border:none;
-    border-radius:14px;
-
-    background:linear-gradient(
-        90deg,
-        #4facfe,
-        #00f2fe
-    );
-
-    color:white;
-
-    cursor:pointer;
-
-    font-size:15px;
-
-    transition:0.3s;
-}
-
-.camera-modal button:hover{
-    transform:scale(1.05);
-}
-
-/* STATUS */
-#scanStatus{
-    padding:10px 16px;
-
-    background:rgba(255,255,255,0.1);
-
-    border-radius:12px;
-
-    margin-top:15px;
-
-    backdrop-filter:blur(10px);
-}
-
-/* ANIMATIONS */
-@keyframes fadeIn{
-
-    from{
-        opacity:0;
-        transform:translateY(20px);
     }
 
-    to{
-        opacity:1;
-        transform:translateY(0);
+    history.forEach(item => {
+
+        historyBox.innerHTML += `
+        <div class="history-item">
+            <b>Input:</b> ${item.input}<br>
+            <b>Output:</b> ${item.output}
+        </div>
+        `;
+
+    });
+
+}
+
+function clearHistory() {
+
+    localStorage.removeItem("translatorHistory");
+
+    showHistory();
+
+}
+
+// =========================
+// AUTO RESIZE
+// =========================
+function autoResize(el) {
+
+    el.style.height = "auto";
+
+    el.style.height =
+        el.scrollHeight + "px";
+
+}
+
+// =========================
+// SWAP LANGUAGE
+// =========================
+function swapLang() {
+
+    let from =
+        document.getElementById("fromLang");
+
+    let to =
+        document.getElementById("toLang");
+
+    [from.value, to.value] =
+        [to.value, from.value];
+
+    translateText();
+
+}
+
+// =========================
+// LANGUAGE MAP
+// =========================
+const speechLangMap = {
+
+    en: "en-US",
+    hi: "hi-IN",
+    te: "te-IN",
+    ta: "ta-IN",
+    kn: "kn-IN",
+    ml: "ml-IN"
+
+};
+
+// =========================
+// VOICE INPUT
+// =========================
+function startVoice() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+        alert(
+            "Voice recognition not supported"
+        );
+
+        return;
+
+    }
+
+    let recognition =
+        new SpeechRecognition();
+
+    recognition.lang =
+        speechLangMap[
+            document.getElementById("fromLang").value
+        ];
+
+    recognition.interimResults = false;
+
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (e) => {
+
+        const text =
+            e.results[0][0].transcript;
+
+        document.getElementById("inputText")
+            .value = text;
+
+        autoResize(
+            document.getElementById("inputText")
+        );
+
+        translateText();
+
+    };
+
+    recognition.onerror = () => {
+
+        alert("Voice recognition error");
+
+    };
+
+    recognition.start();
+
+}
+
+// =========================
+// TRANSLATE
+// =========================
+async function translateText(autoSpeak = true) {
+
+    let text =
+        document.getElementById("inputText").value;
+
+    let from =
+        document.getElementById("fromLang").value;
+
+    let to =
+        document.getElementById("toLang").value;
+
+    const output =
+        document.getElementById("outputText");
+
+    if (!text.trim()) {
+
+        output.value = "";
+
+        return;
+
+    }
+
+    output.value = "Translating...";
+
+    try {
+
+        let url =
+            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+
+        let res = await fetch(url);
+
+        let data = await res.json();
+
+        let translated =
+            data[0]
+            .map(item => item[0])
+            .join("");
+
+        output.value = translated;
+
+        autoResize(output);
+
+        saveHistory(text, translated);
+
+        // AUTO SPEAK
+        if (autoSpeak) {
+
+            speakOutput();
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+        output.value =
+            "Translation Error";
+
     }
 
 }
 
-@keyframes bgMove{
+// =========================
+// SPEAK OUTPUT
+// =========================
+function speakOutput() {
 
-    0%{
-        background-position:0% 50%;
-    }
+    let text =
+        document.getElementById("outputText").value;
 
-    50%{
-        background-position:100% 50%;
-    }
+    if (!text.trim()) return;
 
-    100%{
-        background-position:0% 50%;
+    speechSynthesis.cancel();
+
+    const speech =
+        new SpeechSynthesisUtterance(text);
+
+    const lang =
+        document.getElementById("toLang").value;
+
+    speech.lang =
+        speechLangMap[lang] || "en-US";
+
+    speech.rate = 1;
+
+    speech.pitch = 1;
+
+    speech.volume = 1;
+
+    speechSynthesis.speak(speech);
+
+}
+
+// =========================
+// OPEN CAMERA
+// =========================
+async function openCamera() {
+
+    const modal =
+        document.getElementById("cameraModal");
+
+    const video =
+        document.getElementById("camera");
+
+    const status =
+        document.getElementById("scanStatus");
+
+    try {
+
+        status.innerHTML =
+            "Opening camera...";
+
+        modal.style.display = "flex";
+
+        stream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video: {
+                    facingMode: {
+                        ideal: "environment"
+                    },
+                    width: {
+                        ideal: 1920
+                    },
+                    height: {
+                        ideal: 1080
+                    }
+                },
+
+                audio: false
+
+            });
+
+        video.srcObject = stream;
+
+        await video.play();
+
+        status.innerHTML =
+            "✅ Camera ready. Click 'Click Me' button.";
+
+    } catch (err) {
+
+        console.log(err);
+
+        status.innerHTML =
+            "❌ Camera permission denied";
+
+        alert(
+            "Please allow camera permission"
+        );
+
     }
 
 }
 
-/* MOBILE */
-@media(max-width:500px){
+// =========================
+// CLOSE CAMERA
+// =========================
+function closeCamera() {
 
-    .card{
-        padding:16px;
+    const modal =
+        document.getElementById("cameraModal");
+
+    if (stream) {
+
+        stream.getTracks().forEach(track => {
+
+            track.stop();
+
+        });
+
     }
 
-    .welcome-box{
-        padding:25px 18px;
+    modal.style.display = "none";
+
+}
+
+// =========================
+// CAPTURE IMAGE
+// =========================
+async function captureImage() {
+
+    const video =
+        document.getElementById("camera");
+
+    const canvas =
+        document.getElementById("captureCanvas");
+
+    const status =
+        document.getElementById("scanStatus");
+
+    const scanBtn =
+        document.getElementById("scanBtn");
+
+    scanBtn.disabled = true;
+
+    status.innerHTML =
+        "📸 Capturing image...";
+
+    try {
+
+        canvas.width =
+            video.videoWidth;
+
+        canvas.height =
+            video.videoHeight;
+
+        const ctx =
+            canvas.getContext("2d");
+
+        // BETTER IMAGE QUALITY
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        status.innerHTML =
+            "🔍 Scanning text...";
+
+        // OCR
+        const result =
+            await Tesseract.recognize(
+                canvas,
+                "eng+hin+tel",
+                {
+                    logger: m => {
+
+                        if (m.status) {
+
+                            status.innerHTML =
+                                `🔍 ${m.status}`;
+
+                        }
+
+                    }
+                }
+            );
+
+        const text =
+            result.data.text.trim();
+
+        if (!text) {
+
+            status.innerHTML =
+                "❌ No text detected";
+
+            scanBtn.disabled = false;
+
+            return;
+
+        }
+
+        // PUT TEXT
+        document.getElementById("inputText")
+            .value = text;
+
+        autoResize(
+            document.getElementById("inputText")
+        );
+
+        status.innerHTML =
+            "✅ Text detected successfully";
+
+        // AUTO TRANSLATE
+        await translateText(true);
+
+        status.innerHTML =
+            "✅ Translation completed";
+
+        // AUTO CLOSE CAMERA
+        setTimeout(() => {
+
+            closeCamera();
+
+        }, 1500);
+
+    } catch (err) {
+
+        console.log(err);
+
+        status.innerHTML =
+            "❌ OCR failed";
+
     }
 
-    .camera-modal video{
-        width:95%;
-    }
+    scanBtn.disabled = false;
 
-    .btn,
-    .small-btn{
-        font-size:14px;
-    }
+}
+
+// =========================
+// FILE MENU
+// =========================
+function toggleFileMenu() {
+
+    const popup =
+        document.getElementById("filePopup");
+
+    popup.style.display =
+        popup.style.display === "flex"
+            ? "none"
+            : "flex";
+
+}
+
+// =========================
+// LOAD FILE
+// =========================
+function loadFile(event) {
+
+    const file =
+        event.target.files[0];
+
+    if (!file) return;
+
+    const reader =
+        new FileReader();
+
+    reader.onload = function(e) {
+
+        const text =
+            e.target.result;
+
+        document.getElementById("inputText")
+            .value = text;
+
+        autoResize(
+            document.getElementById("inputText")
+        );
+
+        translateText();
+
+    };
+
+    reader.readAsText(file);
 
 }
