@@ -16,13 +16,10 @@ body{
     );
 
     background-size:400% 400%;
-
     animation:bgMove 12s ease infinite;
 
     color:#111;
-
     min-height:100vh;
-
     overflow-x:hidden;
 }
 
@@ -35,7 +32,6 @@ body.dark{
 /* MENU BUTTON */
 .menu-btn{
     position:fixed;
-
     top:15px;
     right:15px;
 
@@ -105,11 +101,9 @@ body.dark .side-menu{
 /* SIDE BUTTONS */
 .side-menu button{
     width:100%;
-
     padding:12px;
 
     border:none;
-
     border-radius:18px;
 
     background:linear-gradient(
@@ -119,7 +113,6 @@ body.dark .side-menu{
     );
 
     color:white;
-
     cursor:pointer;
 
     transition:0.3s;
@@ -142,7 +135,6 @@ body.dark .side-menu{
     background:rgba(0,0,0,0.45);
 
     opacity:0;
-
     pointer-events:none;
 
     transition:0.3s;
@@ -219,7 +211,6 @@ h2{
     );
 
     -webkit-background-clip:text;
-
     -webkit-text-fill-color:transparent;
 }
 
@@ -228,7 +219,6 @@ h2{
     padding:14px 20px;
 
     border:none;
-
     border-radius:22px;
 
     background:linear-gradient(
@@ -238,7 +228,6 @@ h2{
     );
 
     color:white;
-
     cursor:pointer;
 
     transition:0.3s;
@@ -275,6 +264,8 @@ h2{
     padding:20px;
 
     animation:fadeIn 0.6s ease;
+
+    position:relative;
 }
 
 body.dark .card{
@@ -284,13 +275,10 @@ body.dark .card{
 /* MODE */
 .mode{
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
 
     font-size:13px;
-
     color:gray;
 }
 
@@ -300,7 +288,6 @@ body.dark .card{
     height:42px;
 
     border:none;
-
     border-radius:50%;
 
     background:linear-gradient(
@@ -325,7 +312,6 @@ body.dark .card{
 /* INPUT WRAPPER */
 .input-wrapper{
     position:relative;
-
     width:100%;
 }
 
@@ -335,20 +321,17 @@ body.dark .card{
     width:100%;
 
     min-height:55px;
-    max-height:180px;
+    max-height:220px;
 
     padding:14px;
-
     padding-right:60px;
 
     border:none;
-
     border-radius:18px;
 
     resize:none;
 
     overflow-y:auto;
-
     outline:none;
 
     font-size:15px;
@@ -356,12 +339,13 @@ body.dark .card{
     background:rgba(255,255,255,0.65);
 
     backdrop-filter:blur(10px);
+
+    line-height:1.5;
 }
 
 body.dark .chat-input,
 body.dark .chat-output{
     background:rgba(255,255,255,0.1);
-
     color:white;
 }
 
@@ -378,7 +362,6 @@ body.dark .chat-output{
     height:32px;
 
     border:none;
-
     border-radius:10px;
 
     background:rgba(0,0,0,0.2);
@@ -418,7 +401,6 @@ body.dark .chat-output{
 
 body.dark .file-popup{
     background:rgba(30,30,40,0.96);
-
     color:white;
 }
 
@@ -429,17 +411,17 @@ select{
     padding:12px;
 
     border:none;
-
     border-radius:18px;
 
     outline:none;
 
     background:rgba(255,255,255,0.65);
+
+    font-size:15px;
 }
 
 body.dark select{
     background:rgba(255,255,255,0.1);
-
     color:white;
 }
 
@@ -450,7 +432,6 @@ body.dark select{
     padding:13px;
 
     border:none;
-
     border-radius:22px;
 
     background:linear-gradient(
@@ -464,6 +445,8 @@ body.dark select{
     cursor:pointer;
 
     transition:0.3s;
+
+    font-size:15px;
 }
 
 .btn:hover{
@@ -473,7 +456,6 @@ body.dark select{
 /* ROW */
 .row{
     display:flex;
-
     gap:10px;
 }
 
@@ -484,7 +466,6 @@ body.dark select{
     padding:12px;
 
     border:none;
-
     border-radius:20px;
 
     background:linear-gradient(
@@ -496,6 +477,12 @@ body.dark select{
     color:white;
 
     cursor:pointer;
+
+    transition:0.3s;
+}
+
+.small-btn:hover{
+    transform:scale(1.03);
 }
 
 /* CAMERA MODAL */
@@ -515,7 +502,6 @@ body.dark select{
     flex-direction:column;
 
     align-items:center;
-
     justify-content:center;
 
     padding:20px;
@@ -526,7 +512,6 @@ body.dark select{
 /* CAMERA VIDEO */
 .camera-modal video{
     width:100%;
-
     max-width:520px;
 
     border-radius:20px;
@@ -536,6 +521,8 @@ body.dark select{
     border:3px solid white;
 
     object-fit:cover;
+
+    box-shadow:0 0 30px rgba(255,255,255,0.2);
 }
 
 /* CAMERA BUTTONS */
@@ -543,7 +530,6 @@ body.dark select{
     padding:12px 18px;
 
     border:none;
-
     border-radius:14px;
 
     background:linear-gradient(
@@ -563,6 +549,19 @@ body.dark select{
 
 .camera-modal button:hover{
     transform:scale(1.05);
+}
+
+/* STATUS */
+#scanStatus{
+    padding:10px 16px;
+
+    background:rgba(255,255,255,0.1);
+
+    border-radius:12px;
+
+    margin-top:15px;
+
+    backdrop-filter:blur(10px);
 }
 
 /* ANIMATIONS */
@@ -609,6 +608,11 @@ body.dark select{
 
     .camera-modal video{
         width:95%;
+    }
+
+    .btn,
+    .small-btn{
+        font-size:14px;
     }
 
 }
