@@ -1,612 +1,618 @@
-let stream;
-
-// =========================
-// TYPEWRITER
-// =========================
-function typeWriter(element, text, speed = 80, callback) {
-
-    let i = 0;
-
-    element.innerHTML = "";
-
-    function typing() {
-
-        if (i < text.length) {
-
-            element.innerHTML += text.charAt(i);
-
-            i++;
-
-            setTimeout(typing, speed);
-
-        } else if (callback) {
-
-            callback();
-
-        }
-
-    }
-
-    typing();
-
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
 }
 
-
-// =========================
-// PAGE LOAD
-// =========================
-document.addEventListener("DOMContentLoaded", () => {
-
-    const welcomeTitle =
-        document.querySelector(".welcome-box h1");
-
-    const mainTitle =
-        document.querySelector(".card h2");
-
-    if (welcomeTitle) {
-
-        typeWriter(
-            welcomeTitle,
-            welcomeTitle.innerText,
-            70
-        );
-
-    }
-
-    if (mainTitle) {
-
-        setTimeout(() => {
-
-            typeWriter(
-                mainTitle,
-                mainTitle.innerText,
-                60
-            );
-
-        }, 1200);
-
-    }
-
-    // AUTO TRANSLATE
-    const input =
-        document.getElementById("inputText");
-
-    if (input) {
-
-        let timer;
-
-        input.addEventListener("input", () => {
-
-            autoResize(input);
-
-            clearTimeout(timer);
-
-            timer = setTimeout(() => {
-
-                translateText();
-
-            }, 500);
-
-        });
-
-    }
-
-    // LOAD THEME
-    if (localStorage.getItem("theme") === "dark") {
-
-        document.body.classList.add("dark");
-
-    }
-
-});
-
-
-// =========================
-// START APP
-// =========================
-function startApp() {
-
-    document.getElementById("welcomeScreen")
-        .style.display = "none";
-
-    document.getElementById("mainApp")
-        .style.display = "flex";
-
-}
-
-
-// =========================
-// MENU
-// =========================
-function toggleMenu() {
-
-    const menu =
-        document.getElementById("sideMenu");
-
-    const overlay =
-        document.getElementById("overlay");
-
-    menu.classList.toggle("active");
-
-    overlay.classList.toggle("active");
-
-}
-
-
-// =========================
-// DARK MODE
-// =========================
-function toggleTheme() {
-
-    document.body.classList.toggle("dark");
-
-    localStorage.setItem(
-        "theme",
-        document.body.classList.contains("dark")
-            ? "dark"
-            : "light"
+/* BODY */
+body{
+    background:linear-gradient(
+        270deg,
+        #4facfe,
+        #00f2fe,
+        #6a11cb,
+        #ff0066
     );
 
+    background-size:400% 400%;
+    animation:bgMove 12s ease infinite;
+
+    color:#111;
+    min-height:100vh;
+    overflow-x:hidden;
 }
 
+/* DARK MODE */
+body.dark{
+    background:#0f172a;
+    color:white;
+}
 
-// =========================
-// HISTORY
-// =========================
-function saveHistory(input, output) {
+/* MENU BUTTON */
+.menu-btn{
+    position:fixed;
+    top:15px;
+    right:15px;
 
-    let history =
-        JSON.parse(
-            localStorage.getItem("translatorHistory")
-        ) || [];
+    width:50px;
+    height:50px;
 
-    history.unshift({ input, output });
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    if (history.length > 20) {
+    font-size:25px;
 
-        history.pop();
+    background:rgba(255,255,255,0.75);
 
-    }
+    backdrop-filter:blur(12px);
 
-    localStorage.setItem(
-        "translatorHistory",
-        JSON.stringify(history)
+    border-radius:18px;
+
+    cursor:pointer;
+
+    z-index:1000;
+
+    transition:0.3s;
+}
+
+.menu-btn:hover{
+    transform:scale(1.08);
+}
+
+/* SIDE MENU */
+.side-menu{
+    position:fixed;
+
+    top:0;
+    right:-320px;
+
+    width:300px;
+    height:100%;
+
+    background:rgba(255,255,255,0.82);
+
+    backdrop-filter:blur(16px);
+
+    padding:20px;
+
+    box-shadow:-5px 0 20px rgba(0,0,0,0.3);
+
+    z-index:1001;
+
+    transition:0.4s ease;
+
+    overflow-y:auto;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.side-menu.active{
+    right:0;
+}
+
+body.dark .side-menu{
+    background:rgba(20,20,30,0.9);
+}
+
+/* SIDE BUTTONS */
+.side-menu button{
+    width:100%;
+    padding:12px;
+
+    border:none;
+    border-radius:18px;
+
+    background:linear-gradient(
+        90deg,
+        #4facfe,
+        #00f2fe
     );
 
+    color:white;
+    cursor:pointer;
+
+    transition:0.3s;
 }
 
-function showHistory() {
-
-    let historyBox =
-        document.getElementById("historyBox");
-
-    let history =
-        JSON.parse(
-            localStorage.getItem("translatorHistory")
-        ) || [];
-
-    historyBox.innerHTML = "<h4>History</h4>";
-
-    if (history.length === 0) {
-
-        historyBox.innerHTML +=
-            "<p>No history yet</p>";
-
-        return;
-
-    }
-
-    history.forEach(item => {
-
-        historyBox.innerHTML += `
-        <div class="history-item">
-            <b>Input:</b> ${item.input}<br>
-            <b>Output:</b> ${item.output}
-        </div>
-        `;
-
-    });
-
+.side-menu button:hover{
+    transform:translateY(-2px);
 }
 
-function clearHistory() {
+/* OVERLAY */
+.overlay{
+    position:fixed;
 
-    localStorage.removeItem("translatorHistory");
+    top:0;
+    left:0;
 
-    showHistory();
+    width:100%;
+    height:100%;
 
+    background:rgba(0,0,0,0.45);
+
+    opacity:0;
+    pointer-events:none;
+
+    transition:0.3s;
+
+    z-index:900;
 }
 
-
-// =========================
-// AUTO RESIZE
-// =========================
-function autoResize(el) {
-
-    el.style.height = "auto";
-
-    el.style.height = el.scrollHeight + "px";
-
+.overlay.active{
+    opacity:1;
+    pointer-events:auto;
 }
 
+/* HISTORY */
+.history-item{
+    background:rgba(255,255,255,0.6);
 
-// =========================
-// SWAP LANGUAGE
-// =========================
-function swapLang() {
+    padding:10px;
 
-    let from =
-        document.getElementById("fromLang");
+    border-radius:12px;
 
-    let to =
-        document.getElementById("toLang");
+    font-size:13px;
 
-    [from.value, to.value] =
-        [to.value, from.value];
-
-    translateText();
-
+    line-height:1.5;
 }
 
-
-// =========================
-// VOICE INPUT
-// =========================
-function startVoice() {
-
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-
-        alert("Voice recognition not supported");
-
-        return;
-
-    }
-
-    let recognition =
-        new SpeechRecognition();
-
-    recognition.lang =
-        document.getElementById("fromLang").value;
-
-    recognition.onresult = (e) => {
-
-        document.getElementById("inputText").value =
-            e.results[0][0].transcript;
-
-        autoResize(
-            document.getElementById("inputText")
-        );
-
-        translateText();
-
-    };
-
-    recognition.start();
-
+body.dark .history-item{
+    background:rgba(255,255,255,0.1);
 }
 
+/* WELCOME */
+.welcome{
+    width:100%;
+    height:100vh;
 
-// =========================
-// TRANSLATE
-// =========================
-async function translateText() {
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    let text =
-        document.getElementById("inputText").value;
-
-    let from =
-        document.getElementById("fromLang").value;
-
-    let to =
-        document.getElementById("toLang").value;
-
-    if (!text.trim()) {
-
-        document.getElementById("outputText")
-            .value = "";
-
-        return;
-
-    }
-
-    try {
-
-        let url =
-            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
-
-        let res = await fetch(url);
-
-        let data = await res.json();
-
-        let translated =
-            data[0].map(item => item[0]).join("");
-
-        let output =
-            document.getElementById("outputText");
-
-        output.value = translated;
-
-        autoResize(output);
-
-        saveHistory(text, translated);
-
-    } catch (err) {
-
-        document.getElementById("outputText")
-            .value = "Translation Error";
-
-    }
-
+    padding:20px;
 }
 
+.welcome-box{
+    width:100%;
+    max-width:420px;
 
-// =========================
-// SPEAK OUTPUT
-// =========================
-function speakOutput() {
+    background:rgba(255,255,255,0.78);
 
-    let text =
-        document.getElementById("outputText").value;
+    backdrop-filter:blur(18px);
 
-    if (!text) return;
+    border-radius:24px;
 
-    let speech =
-        new SpeechSynthesisUtterance(text);
+    padding:35px 25px;
 
-    speech.lang =
-        document.getElementById("toLang").value;
+    text-align:center;
 
-    speechSynthesis.cancel();
+    display:flex;
+    flex-direction:column;
+    gap:16px;
 
-    speechSynthesis.speak(speech);
-
+    animation:fadeIn 0.7s ease;
 }
 
-
-// =========================
-// CAMERA OPEN
-// =========================
-async function openCamera() {
-
-    const modal =
-        document.getElementById("cameraModal");
-
-    const video =
-        document.getElementById("camera");
-
-    const status =
-        document.getElementById("scanStatus");
-
-    // CHECK SUPPORT
-    if (
-        !navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia
-    ) {
-
-        alert(
-            "Camera not supported in this browser"
-        );
-
-        return;
-
-    }
-
-    try {
-
-        // OPEN CAMERA
-        stream =
-            await navigator.mediaDevices.getUserMedia({
-
-                video: {
-                    facingMode: "environment"
-                },
-
-                audio: false
-
-            });
-
-        // SHOW MODAL
-        modal.style.display = "flex";
-
-        // ATTACH CAMERA
-        video.srcObject = stream;
-
-        // PLAY VIDEO
-        await video.play();
-
-        status.innerHTML =
-            "✅ Camera ready. Scan document now.";
-
-    } catch (err) {
-
-        console.log(err);
-
-        status.innerHTML =
-            "❌ Camera permission denied";
-
-        alert(
-            "Allow camera permission in browser settings"
-        );
-
-    }
-
+body.dark .welcome-box{
+    background:rgba(20,20,30,0.85);
 }
 
-
-// =========================
-// CLOSE CAMERA
-// =========================
-function closeCamera() {
-
-    const modal =
-        document.getElementById("cameraModal");
-
-    if (stream) {
-
-        stream.getTracks().forEach(track => {
-
-            track.stop();
-
-        });
-
-    }
-
-    modal.style.display = "none";
-
-}
-
-
-// =========================
-// SCAN DOCUMENT
-// =========================
-async function captureImage() {
-
-    const video =
-        document.getElementById("camera");
-
-    const canvas =
-        document.getElementById("captureCanvas");
-
-    const status =
-        document.getElementById("scanStatus");
-
-    status.innerHTML =
-        "🔍 Scanning text...";
-
-    // CANVAS SIZE
-    canvas.width = video.videoWidth;
-
-    canvas.height = video.videoHeight;
-
-    // DRAW IMAGE
-    const ctx =
-        canvas.getContext("2d");
-
-    ctx.drawImage(
-        video,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+/* TITLES */
+h1,
+h2{
+    background:linear-gradient(
+        90deg,
+        #00f2fe,
+        #4facfe
     );
 
-    try {
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
 
-        // OCR USING TESSERACT
-        const result =
-            await Tesseract.recognize(
-                canvas,
-                "eng",
-                {
-                    logger: m => {
+/* START BUTTON */
+.start-btn{
+    padding:14px 20px;
 
-                        if (m.status) {
+    border:none;
+    border-radius:22px;
 
-                            status.innerHTML =
-                                "🔍 " +
-                                m.status;
+    background:linear-gradient(
+        90deg,
+        #4facfe,
+        #00f2fe
+    );
 
-                        }
+    color:white;
+    cursor:pointer;
 
-                    }
-                }
-            );
+    transition:0.3s;
+}
 
-        const text =
-            result.data.text.trim();
+.start-btn:hover{
+    transform:scale(1.05);
+}
 
-        // NO TEXT
-        if (!text) {
+/* MAIN APP */
+.main-app{
+    display:none;
 
-            status.innerHTML =
-                "❌ No text detected";
+    width:100%;
+    min-height:100vh;
 
-            return;
+    align-items:center;
+    justify-content:center;
 
-        }
+    padding:20px;
+}
 
-        // INSERT TEXT
-        document.getElementById("inputText")
-            .value = text;
+/* CARD */
+.card{
+    width:100%;
+    max-width:420px;
 
-        autoResize(
-            document.getElementById("inputText")
-        );
+    background:rgba(255,255,255,0.78);
 
-        // TRANSLATE
-        translateText();
+    backdrop-filter:blur(20px);
 
-        status.innerHTML =
-            "✅ Text scanned successfully";
+    border-radius:24px;
 
-        // CLOSE CAMERA
-        setTimeout(() => {
+    padding:20px;
 
-            closeCamera();
+    animation:fadeIn 0.6s ease;
 
-        }, 1500);
+    position:relative;
+}
 
-    } catch (err) {
+body.dark .card{
+    background:rgba(20,20,30,0.88);
+}
 
-        console.log(err);
+/* MODE */
+.mode{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 
-        status.innerHTML =
-            "❌ OCR failed";
+    font-size:13px;
+    color:gray;
+}
 
+/* CAMERA BUTTON */
+.camera-btn{
+    width:42px;
+    height:42px;
+
+    border:none;
+    border-radius:50%;
+
+    background:linear-gradient(
+        90deg,
+        #ff7eb3,
+        #ff758c
+    );
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.camera-btn:hover{
+    transform:scale(1.08);
+}
+
+/* INPUT WRAPPER */
+.input-wrapper{
+    position:relative;
+    width:100%;
+}
+
+/* TEXTAREAS */
+.chat-input,
+.chat-output{
+    width:100%;
+
+    min-height:55px;
+    max-height:220px;
+
+    padding:14px;
+    padding-right:60px;
+
+    border:none;
+    border-radius:18px;
+
+    resize:none;
+
+    overflow-y:auto;
+    outline:none;
+
+    font-size:15px;
+
+    background:rgba(255,255,255,0.65);
+
+    backdrop-filter:blur(10px);
+
+    line-height:1.5;
+}
+
+body.dark .chat-input,
+body.dark .chat-output{
+    background:rgba(255,255,255,0.1);
+    color:white;
+}
+
+/* FILE BUTTON */
+.file-menu-btn{
+    position:absolute;
+
+    top:50%;
+    right:10px;
+
+    transform:translateY(-50%);
+
+    width:32px;
+    height:32px;
+
+    border:none;
+    border-radius:10px;
+
+    background:rgba(0,0,0,0.2);
+
+    color:white;
+
+    cursor:pointer;
+}
+
+/* FILE POPUP */
+.file-popup{
+    position:absolute;
+
+    top:65px;
+    right:10px;
+
+    width:220px;
+
+    background:rgba(255,255,255,0.95);
+
+    backdrop-filter:blur(14px);
+
+    border-radius:16px;
+
+    padding:12px;
+
+    display:none;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    z-index:9999;
+
+    box-shadow:0 0 20px rgba(0,0,0,0.2);
+}
+
+body.dark .file-popup{
+    background:rgba(30,30,40,0.96);
+    color:white;
+}
+
+/* SELECT */
+select{
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+    border-radius:18px;
+
+    outline:none;
+
+    background:rgba(255,255,255,0.65);
+
+    font-size:15px;
+}
+
+body.dark select{
+    background:rgba(255,255,255,0.1);
+    color:white;
+}
+
+/* BUTTON */
+.btn{
+    width:100%;
+
+    padding:13px;
+
+    border:none;
+    border-radius:22px;
+
+    background:linear-gradient(
+        90deg,
+        #6a11cb,
+        #2575fc
+    );
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+    font-size:15px;
+}
+
+.btn:hover{
+    transform:scale(1.02);
+}
+
+/* ROW */
+.row{
+    display:flex;
+    gap:10px;
+}
+
+/* SMALL BUTTONS */
+.small-btn{
+    flex:1;
+
+    padding:12px;
+
+    border:none;
+    border-radius:20px;
+
+    background:linear-gradient(
+        90deg,
+        #4facfe,
+        #00f2fe
+    );
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.small-btn:hover{
+    transform:scale(1.03);
+}
+
+/* CAMERA MODAL */
+.camera-modal{
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,0.97);
+
+    display:none;
+
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+    z-index:99999;
+}
+
+/* CAMERA VIDEO */
+.camera-modal video{
+    width:100%;
+    max-width:520px;
+
+    border-radius:20px;
+
+    background:black;
+
+    border:3px solid white;
+
+    object-fit:cover;
+
+    box-shadow:0 0 30px rgba(255,255,255,0.2);
+}
+
+/* CAMERA BUTTONS */
+.camera-modal button{
+    padding:12px 18px;
+
+    border:none;
+    border-radius:14px;
+
+    background:linear-gradient(
+        90deg,
+        #4facfe,
+        #00f2fe
+    );
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    transition:0.3s;
+}
+
+.camera-modal button:hover{
+    transform:scale(1.05);
+}
+
+/* STATUS */
+#scanStatus{
+    padding:10px 16px;
+
+    background:rgba(255,255,255,0.1);
+
+    border-radius:12px;
+
+    margin-top:15px;
+
+    backdrop-filter:blur(10px);
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
     }
 
 }
 
+@keyframes bgMove{
 
-// =========================
-// FILE MENU
-// =========================
-function toggleFileMenu() {
+    0%{
+        background-position:0% 50%;
+    }
 
-    const popup =
-        document.getElementById("filePopup");
+    50%{
+        background-position:100% 50%;
+    }
 
-    popup.style.display =
-        popup.style.display === "flex"
-            ? "none"
-            : "flex";
+    100%{
+        background-position:0% 50%;
+    }
 
 }
 
+/* MOBILE */
+@media(max-width:500px){
 
-// =========================
-// LOAD FILE
-// =========================
-function loadFile(event) {
+    .card{
+        padding:16px;
+    }
 
-    const file =
-        event.target.files[0];
+    .welcome-box{
+        padding:25px 18px;
+    }
 
-    if (!file) return;
+    .camera-modal video{
+        width:95%;
+    }
 
-    const reader =
-        new FileReader();
-
-    reader.onload = function(e) {
-
-        const text =
-            e.target.result;
-
-        document.getElementById("inputText")
-            .value = text;
-
-        autoResize(
-            document.getElementById("inputText")
-        );
-
-        translateText();
-
-    };
-
-    reader.readAsText(file);
+    .btn,
+    .small-btn{
+        font-size:14px;
+    }
 
 }
